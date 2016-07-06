@@ -1,4 +1,4 @@
 /**
  * app.js
  */
-require("fake-lib").say();
+require("./src/fake-lib.js").say();

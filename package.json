@@ -2,11 +2,8 @@
   "name": "browserify-nightmare",
   "version": "1.0.0",
   "main": "app.js",
-  "browser": {
-    "fake-lib": "./src/fake-lib.js"
-  },
   "browserify-shim": {
-    "fake-lib": "global:fakeLib"
+    "./src/fake-lib.js": "global:fakeLib"
   },
   "browserify": {
     "transform": "browserify-shim"
