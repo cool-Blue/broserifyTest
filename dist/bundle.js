@@ -23,11 +23,40 @@
     return s
 })({
     1: [function(require, module, exports) {
-        (function(global) {
-            /**
-             * app.js
-             */
-            (typeof window !== "undefined" ? window['fakeLib'] : typeof global !== "undefined" ? global['fakeLib'] : null).say();
+        /**
+         * app.js
+         */
+        require("./src/fake-lib.js").say();
+    }, {
+        "./src/fake-lib.js": 2
+    }],
+    2: [function(require, module, exports) {
+        (function(global) {;
+            var __browserify_shim_require__ = require;
+            (function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
+                /**
+                 * fake-lib.js
+                 */
+                var m1 = __browserify_shim_require__("./m1");
+                var m2 = __browserify_shim_require__("./m2");
+
+                exports.say = function() {
+                    function op(t) {
+                        this.document ?
+                            document.getElementById("output").textContent += t + "\n" :
+                            console.log(t);
+                    }
+                    op(m1.say);
+                    op(m2.say);
+                };
+
+                ;
+                browserify_shim__define__module__export__(typeof fakeLib != "undefined" ? fakeLib : window.fakeLib);
+
+            }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) {
+                module.exports = ex;
+            });
+
         }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
     }, {}]
 }, {}, [1]);

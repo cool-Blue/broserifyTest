@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "browserify-shim": {
-    "./src/fake-lib.js": "global:fakeLib"
+    "./src/fake-lib.js": "fakeLib"
   },
   "browserify": {
     "transform": "browserify-shim"
