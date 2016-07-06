@@ -1,8 +1,8 @@
 /**
  * fake-lib.js
  */
-var m1 = require("./m1");
-var m2 = require("./m2");
+var m1 = require("m1");
+var m2 = require("./src/./m2");
 
 exports.say = function() {
     function op(t){

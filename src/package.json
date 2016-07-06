@@ -8,8 +8,10 @@
     "browserify-shim": "^3.8.12"
   },
   "scripts": {
-    "build-lib": "browserify ./fake-lib.js -s fakeLib > ../dist/fake-lib-bundle-pretty.js",
-    "build-lib-pretty": "browserify ./fake-lib.js -s fakeLib | js-beautify > ../dist/fake-lib-bundle-pretty.js"
+    "build-m1": "browserify -r ./m1.js > ./dist/m1-bundle.js",
+    "build-bundle": "browserify -x ./m1.js -d ./fake-lib.js > ../dist/bundle.js",
+    "build-m1-pretty": "browserify -r ./m1.js | js-beautify > ../dist/m1-bundle.js",
+    "build-bundle-pretty": "browserify -x ./m1.js -d ./fake-lib.js | js-beautify > ../dist/bundle.js"
   },
   "author": "cool.blue",
   "license": "MIT",
