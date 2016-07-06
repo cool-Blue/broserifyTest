@@ -6,7 +6,7 @@
     "fake-lib": "./src/fake-lib.js"
   },
   "browserify-shim": {
-    "fake-lib": "global:fakeLib"
+    "fake-lib": "fakeLib"
   },
   "browserify": {
     "transform": "browserify-shim"

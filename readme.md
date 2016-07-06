@@ -1,4 +1,5 @@
-How to exclude library files from browserify bundle
+# How to exclude library files from browserify bundle
+## delete `global:` in  `browserify-shim` node - BREAKS
 ----
 
 The answer is to use [browserify-shim][1]
