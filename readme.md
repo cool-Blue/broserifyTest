@@ -2,30 +2,30 @@ How to exclude library files from browserify bundle
 ----
 
 The answer is to use [browserify-shim][1]
-In order to figure it out, I created a slightly more complicated scenario with a fake lib file (`main-a.js`) with two sub-dependencies (`m1.js` and `m2.js`) and made the app (`main-b.js`) dependent on the fake lib.
+In order to figure it out, I created a slightly more complicated scenario with a fake lib file (`fake-lib.js`) with two sub-dependencies (`m1.js` and `m2.js`) and made the app (`app.js`) dependent on the fake lib.
 
-I rolled `main-a.js` into a stand-alone bundle that exposed one global called `fakeLib` and used a separate script tag in the index.html to load that.
+I rolled `fake-lib.js` into a stand-alone bundle that exposed one global called `fakeLib` and used a separate script tag in the index.html to load that.
 
-I then used [browserify-shim][1] to build an isomorphic version of the app that required `main-a.js` in node, but used `window.fakeLib` in the browser.  
+I then used [browserify-shim][1] to build an isomorphic version of the app that required `fake-lib.js` in node, but used `window.fakeLib` in the browser.  
 
 
 using this app:
 
     /**
-     * main-b.js
+     * app.js
      */
-    require("./src/main-a").say();
+    require("./src/fake-lib").say();
 
 This does not work: 
 
       "browserify-shim": {
-        "./src/main-a": "fakeLib"
+        "./src/fake-lib": "fakeLib"
       },
 
 but this does:
 
       "browserify-shim": {
-        "./src/main-a": "global:fakeLib"
+        "./src/fake-lib": "global:fakeLib"
       },
 
 You must use this `global:` 
@@ -42,8 +42,8 @@ index.html
     </head>
     <body>
         <div style="white-space: pre;" id="output"></div>
-        <script type="text/javascript" src="dist/main-a-lib-pretty.js"></script>
-        <script type="text/javascript" src="dist/bundle-B.js"></script>
+        <script type="text/javascript" src="dist/fake-lib-bundle-pretty.js"></script>
+        <script type="text/javascript" src="dist/bundle.js"></script>
     </body>
     </html>
 
@@ -65,7 +65,7 @@ Fake library...
 .
 
     /**
-     * main-a.js
+     * fake-lib.js
      */
     var m1 = require("./src/m1");
     var m2 = require("./src/m2");
@@ -85,15 +85,15 @@ package.json for fake lib.  This makes a standalone package that exposes fakeLib
     {
       "name": "browserify-nightmare",
       "version": "1.0.0",
-      "main": "main-a.js",
+      "main": "fake-lib.js",
       "dependencies": {
       },
       "devDependencies": {
         "browserify-shim": "^3.8.12"
       },
       "scripts": {
-        "build-lib": "browserify ./main-a.js -s fakeLib > ../dist/main-a-lib-pretty.js",
-        "build-lib-pretty": "browserify ./main-a.js -s fakeLib | js-beautify > ../dist/main-a-lib-pretty.js"
+        "build-lib": "browserify ./fake-lib.js -s fakeLib > ../dist/fake-lib-bundle-pretty.js",
+        "build-lib-pretty": "browserify ./fake-lib.js -s fakeLib | js-beautify > ../dist/fake-lib-bundle-pretty.js"
       },
       "author": "cool.blue",
       "license": "MIT",
@@ -107,19 +107,19 @@ package.json for fake lib.  This makes a standalone package that exposes fakeLib
 Fake app
 
     /**
-     * main-b.js
+     * app.js
      */
-    require("./src/main-a").say();
+    require("./src/fake-lib").say();
 
-package.json that uses [browserify-shim][1] to return `fakeLib` from `require("./src/main-a")` in the browser but acts like a normal CommonJS module in node.
+package.json that uses [browserify-shim][1] to return `fakeLib` from `require("./src/fake-lib")` in the browser but acts like a normal CommonJS module in node.
 
     {
       "name": "browserify-nightmare",
       "version": "1.0.0",
-      "main": "main-b.js",
+      "main": "app.js",
 
       "browserify-shim": {
-        "./src/main-a": "global:fakeLib"
+        "./src/fake-lib": "global:fakeLib"
       },
       "browserify": {
         "transform": "browserify-shim"
@@ -129,8 +129,8 @@ package.json that uses [browserify-shim][1] to return `fakeLib` from `require(".
       },
 
       "scripts": {
-        "build-B": "browserify ./main-b.js > ./dist/bundle-B.js",
-        "build-B-pretty": "browserify ./main-b.js | js-beautify > ./dist/bundle-B.js"
+        "build-B": "browserify ./app.js > ./dist/bundle.js",
+        "build-B-pretty": "browserify ./app.js | js-beautify > ./dist/bundle.js"
       },
       "author": "cool.blue",
       "license": "MIT",

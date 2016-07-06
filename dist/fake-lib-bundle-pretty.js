@@ -14,7 +14,7 @@
         } else {
             g = this
         }
-        g.mainA = f()
+        g.fakeLib = f()
     }
 })(function() {
     var define, module, exports;
@@ -44,21 +44,9 @@
     })({
         1: [function(require, module, exports) {
             /**
-             * m1.js
+             * fake-lib.js
              */
-            exports.say = "first module";
-        }, {}],
-        2: [function(require, module, exports) {
-            /**
-             * m2.js
-             */
-            exports.say = "second module";
-        }, {}],
-        3: [function(require, module, exports) {
-            /**
-             * main-a.js
-             */
-            var m1 = this.m1 || require("./m1");
+            var m1 = require("./m1");
             var m2 = require("./m2");
 
             exports.say = function() {
@@ -72,8 +60,20 @@
             };
 
         }, {
-            "./m1": 1,
-            "./m2": 2
-        }]
-    }, {}, [3])(3)
+            "./m1": 2,
+            "./m2": 3
+        }],
+        2: [function(require, module, exports) {
+            /**
+             * m1.js
+             */
+            exports.say = "first module";
+        }, {}],
+        3: [function(require, module, exports) {
+            /**
+             * m2.js
+             */
+            exports.say = "second module";
+        }, {}]
+    }, {}, [1])(1)
 });
