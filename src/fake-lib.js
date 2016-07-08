@@ -1,15 +1,9 @@
 /**
  * fake-lib.js
  */
-var m1 = require("./m1");
-var m2 = require("./m2");
 
-exports.say = function() {
-    function op(t){
-        this.document
-            ? document.getElementById("output").textContent += t + "\n"
-            : console.log(t);
-    }
-    op(m1.say);
-    op(m2.say);
-};
+(function(global){
+    var _ns = global.ns = {};
+    _ns.first = "first module";
+    _ns.second = "second module";
+})(this);

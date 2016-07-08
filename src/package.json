@@ -1,15 +1,19 @@
 {
   "name": "browserify-nightmare",
   "version": "1.0.0",
-  "main": "fake-lib.js",
-  "dependencies": {
+  "main": "app.js",
+  "browserify-shim": {
+    "./src/fake-lib.js": {"exports": "ns"}
+  },
+  "browserify": {
+    "transform": "browserify-shim"
   },
   "devDependencies": {
     "browserify-shim": "^3.8.12"
   },
   "scripts": {
-    "build-lib": "browserify ./fake-lib.js -s fakeLib > ../dist/fake-lib-bundle-pretty.js",
-    "build-lib-pretty": "browserify ./fake-lib.js -s fakeLib | js-beautify > ../dist/fake-lib-bundle-pretty.js"
+    "build": "browserify ./fake-lib.js -s ns > ../dist/lib-bundle.js",
+    "build-pretty": "browserify ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle.js"
   },
   "author": "cool.blue",
   "license": "MIT",

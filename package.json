@@ -2,11 +2,8 @@
   "name": "browserify-nightmare",
   "version": "1.0.0",
   "main": "app.js",
-  "browser": {
-    "fake-lib": "./src/fake-lib.js"
-  },
   "browserify-shim": {
-    "fake-lib": "global:fakeLib"
+    "./src/fake-lib.js": {"exports": "ns"}
   },
   "browserify": {
     "transform": "browserify-shim"
@@ -18,7 +15,7 @@
     "build": "browserify ./app.js > ./dist/bundle.js",
     "build-pretty": "browserify ./app.js | js-beautify > ./dist/bundle.js"
   },
-  "author": "cool.blue@y7mail.com",
+  "author": "cool.blue",
   "license": "MIT",
   "description": ""
 }

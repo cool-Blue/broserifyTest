@@ -1,143 +1,150 @@
-How to exclude library files from browserify bundle
+How to reference files loaded from a CDN in a script tag from browserify bundle
 ----
 
-The answer is to use [browserify-shim][1]
-In order to figure it out, I created a slightly more complicated scenario with a fake lib file (`fake-lib.js`) with two sub-dependencies (`m1.js` and `m2.js`) and made the app (`app.js`) dependent on the fake lib.
-
-I rolled `fake-lib.js` into a stand-alone bundle that exposed one global called `fakeLib` and used a separate script tag in the index.html to load that.
-
-I then used [browserify-shim][1] to build an isomorphic version of the app that required `fake-lib.js` in node, but used `window.fakeLib` in the browser.  
-
-
-using this app:
-
-    /**
-     * app.js
-     */
-    require("./src/fake-lib").say();
-
-This does not work: 
-
-      "browserify-shim": {
-        "./src/fake-lib": "fakeLib"
-      },
-
-but this does:
-
-      "browserify-shim": {
-        "./src/fake-lib": "global:fakeLib"
-      },
-
-You must use this `global:` 
-I think that may be due to a bug in browserify because it doesn't agree with the [browserify handbook][2]
-
-----------
-index.html
-
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>browserify test</title>
-    </head>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>browserify test</title>
+</head>
     <body>
         <div style="white-space: pre;" id="output"></div>
-        <script type="text/javascript" src="dist/fake-lib-bundle-pretty.js"></script>
+        <script type="text/javascript" src="src/fake-lib.js"></script>
         <script type="text/javascript" src="dist/bundle.js"></script>
     </body>
-    </html>
+</html>
+```
 
-----------
+#### The answer is to use [browserify-shim][1] 
 
-
-Fake library...
-
-    /**
-     * m1.js
-     */
-    exports.say = "first module";
-.
+using this fake lib, which adds a name space to the global object:
+```js
+/**
+ * fake-lib.js
+ */
  
-    /**
-     * m2.js
-     */
-    exports.say = "second module";
-.
-
-    /**
-     * fake-lib.js
-     */
-    var m1 = require("./src/m1");
-    var m2 = require("./src/m2");
-    
-    exports.say = function() {
-        function op(t){
-            this.document
-                ? document.getElementById("output").textContent += t + "\n"
-                : console.log(t);
-        }
-        op(m1.say);
-        op(m2.say);
-    };
-
-package.json for fake lib.  This makes a standalone package that exposes fakeLib
-
-    {
-      "name": "browserify-nightmare",
-      "version": "1.0.0",
-      "main": "fake-lib.js",
-      "dependencies": {
-      },
-      "devDependencies": {
-        "browserify-shim": "^3.8.12"
-      },
-      "scripts": {
-        "build-lib": "browserify ./fake-lib.js -s fakeLib > ../dist/fake-lib-bundle-pretty.js",
-        "build-lib-pretty": "browserify ./fake-lib.js -s fakeLib | js-beautify > ../dist/fake-lib-bundle-pretty.js"
-      },
-      "author": "cool.blue",
-      "license": "MIT",
-      "description": ""
-    }
+(function(global){
+    var _ns = global.ns = {};
+    _ns.first = "first module";
+    _ns.second = "second module";
+})(this);
+```
+and this fake app to consume it:
+```js
+/**
+ * app.js
+ */
+var local_ns = require("./src/fake-lib.js");
 
 
-----------
+function op(t){
+    this.document
+        ? document.getElementById("output").textContent += t + "\n"
+        : console.log(t);
+}
+op(local_ns.first);
+op(local_ns.second);
+```
+#### Option 1 - make a local copy of the global namespace and include the lib in the bundle
+1.  The browserify-shim node causes the global `ns` to be returned by `require("./src/fake-lib.js")`
+1.  If _**required**_, the lib is included in the bundle
+1.  The included lib is wrapped so that `ns` is returned by `require("./src/fake-lib.js")`
 
+package.json
+```js
 
-Fake app
+"browserify-shim": {
+    "./src/fake-lib.js": "ns"
+},
+"browserify": {
+    "transform": "browserify-shim"
+},
+```
 
+This is equivalent to... 
+```js
+"browserify-shim": {
+    "./src/fake-lib.js": {"exports": "ns"}
+},
+```
+
+### Option 2 - make a local copy of the global namespace and exclude from the bundle
+1.  The browserify-shim node causes the global `ns` to be returned by `require("./src/fake-lib.js")`
+1.  Even if _required_, the lib will not be included in the bundle
+
+package.json
+```js
+"browserify-shim": {
+    "./src/fake-lib.js": "global:ns"
+},
+"browserify": {
+    "transform": "browserify-shim"
+},
+```
+This is equivalent to... 
+```js
+"browserify-shim": {
+    "./src/fake-lib.js": {"exports": "global:ns"}
+},
+```
+This method simply replaces 
+```js
+    var local_ns = require("./src/fake-lib.js");
+```    
+with
+```js
+    var local_ns = (typeof window !== "undefined" ? window['ns'] : typeof global !== "undefined" ? global['ns'] : null);
+```
+The lib source does not need to be included in the project so `./src/fake-lib.js` could be replaced by anything.
+It's only purpose is to tell the require statement which member to strip off the global context.
+
+For example...
+```js
     /**
      * app.js
      */
-    require("./src/fake-lib").say();
+    var local_ns = require("fakeLib");
+```    
+and in the package.json...
+```js
+    "browserify-shim": {
+        "fakeLib": "global:ns"
+    },
+```
+### Option 3 - directly reference the global namespace and include in the bundle
+1.  The browserify-shim node causes the `require("./src/fake-lib.js")` to execute the lib code every time (thus, re-decorating the global object)
+1.  If _**required**_, the lib is included in the bundle
+1.  The included lib is wrapped so that `require("./src/fake-lib.js")` executes the lib code with the `this` context set to the global object
 
-package.json that uses [browserify-shim][1] to return `fakeLib` from `require("./src/fake-lib")` in the browser but acts like a normal CommonJS module in node.
+package.json
+```js
+"browserify-shim": {
+    "./src/fake-lib.js": {"exports": null}
+},
+"browserify": {
+    "transform": "browserify-shim"
+},
+```
 
-    {
-      "name": "browserify-nightmare",
-      "version": "1.0.0",
-      "main": "app.js",
+How to wrap a lib that adds a namespace onto the global object and include in the bundle
+----
 
-      "browserify-shim": {
-        "./src/fake-lib": "global:fakeLib"
-      },
-      "browserify": {
-        "transform": "browserify-shim"
-      },
-      "devDependencies": {
-        "browserify-shim": "^3.8.12"
-      },
-
-      "scripts": {
-        "build-B": "browserify ./app.js > ./dist/bundle.js",
-        "build-B-pretty": "browserify ./app.js | js-beautify > ./dist/bundle.js"
-      },
-      "author": "cool.blue",
-      "license": "MIT",
-      "description": ""
-    }
-
-
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>browserify test</title>
+</head>
+    <body>
+        <div style="white-space: pre;" id="output"></div>
+        <script type="text/javascript" src="dist/bundle.js"></script>
+    </body>
+</html>
+```
+This time, we want to wrap the the lib in such a way that it cannot polute the global namespace but, can be accessed by other modules in the bundle as if it is on the global.
+----------
 ----------
 
 [this answer][3] was super-helpful
