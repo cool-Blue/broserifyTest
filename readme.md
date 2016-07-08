@@ -143,7 +143,22 @@ How to wrap a lib that adds a namespace onto the global object and include in th
     </body>
 </html>
 ```
-This time, we want to wrap the the lib in such a way that it cannot polute the global namespace but, can be accessed by other modules in the bundle as if it is on the global.
+This time, we want to wrap the the lib in such a way that it cannot pollute the global namespace but, can be accessed by other modules in the bundle as if it is on the global.
+
+##### step 1 - bundle the lib as a _standalone_ module
+To do this we need to use the -s option (--standalone) in the build
+```js
+  "browserify-shim": {
+    "./src/fake-lib.js": {"exports": "ns"}
+  },
+  "browserify": {
+    "transform": "browserify-shim"
+  },
+  "scripts": {
+    "build": "browserify ./fake-lib.js -s ns > ../dist/lib-bundle.js",
+    "build-pretty": "browserify ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle.js"
+  },
+```
 ----------
 ----------
 
