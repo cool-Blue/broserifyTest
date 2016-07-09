@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "browserify-shim": {
-    "./src/fake-lib.js": {"exports": "ns"}
+    "./src/fake-lib.js": {
+      "exports": "global:ns"
+    }
   },
   "browserify": {
     "transform": "browserify-shim"
@@ -12,10 +14,14 @@
     "browserify-shim": "^3.8.12"
   },
   "scripts": {
-    "build": "browserify ./app.js > ./dist/bundle.js",
-    "build-pretty": "browserify ./app.js | js-beautify > ./dist/bundle.js"
+    "build": "browserify ./app.js -u node-jsdom -d > ./dist/bundle.js",
+    "build-pretty": "browserify ./app.js -i node-jsdom  | js-beautify > ./dist/bundle.js"
   },
   "author": "cool.blue",
   "license": "MIT",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "node-jsdom": "^3.1.5",
+    "simple-jsdom": "^2.0.0"
+  }
 }
