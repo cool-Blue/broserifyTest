@@ -183,7 +183,7 @@ This is equivalent to...
 },
 ```
 
-[output](./img/opt1_log.png)
+![image](img/opt1_log.png)
 
 #### Option 2 - make a local copy of the global namespace and exclude from the bundle
  * **_expose a local copy of the global namespace object (placed on window by the lib) into the bundle_**
@@ -240,7 +240,7 @@ and in the package.json...
         "fakeLib": "global:ns"
     },
 ```
-[output](./img/opt1_log.png)
+![image](img/opt1_log.png)
 
 #### Complications with including `simple-jsdom`
 The `simple-jsdom` node package was included for idealistic reasons, to make the code isomorphic.  It satisfies fake-jQuery's need for a `window` object in node.  This module needs to be suppressed by browserify as it's not needed in the browser: that section is dead code in the browser so the lib would be pure bloat.  There are two ways to deal with this.
