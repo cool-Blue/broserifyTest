@@ -2,12 +2,6 @@
   "name": "browserify-nightmare",
   "version": "1.0.0",
   "main": "app.js",
-  "browserify-shim": {
-    "./src/fake-lib.js": {"exports": "ns"}
-  },
-  "browserify": {
-    "transform": "browserify-shim"
-  },
   "devDependencies": {
     "browserify-shim": "^3.8.12"
   },

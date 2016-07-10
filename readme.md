@@ -18,7 +18,7 @@
 #### The answer is to use [browserify-shim][1]
 ##### Test code
 
-fake lib stubbed from [jQuery](https://jquery.com/), which adds a name space `ns` to the global object:
+fake lib stubbed from [jQuery](https://jquery.com/), which adds a name space `ns` to the global object:  
 ```js
 /**
  * fake-lib.js
@@ -149,7 +149,7 @@ function main(){
 
 }
 ```
-#### Option 1
+#### Option 1 - use browserify-shim to leak and import the lib namespace
  * **_include the lib in the bundle_**
  * **_export the global namespace member placed on window by the lib into the bundle_**
 
@@ -185,9 +185,9 @@ This is equivalent to...
 
 ![image](img/opt1_log.png)
 
-#### Option 2 - make a local copy of the global namespace and exclude from the bundle
- * **_expose a local copy of the global namespace object (placed on window by the lib) into the bundle_**
+#### Option 2 - use browserify-shim to import the namespace from an external library
  * **_exclude the lib from the bundle and serve it from a cdn via a script tag in the HTML_**
+ * **_import a local copy of the global, namespace object (placed on window by the lib) into the bundle_**
 
 
 1.  The browserify-shim node causes the global `ns` to be returned by `require("./src/fake-lib.js")`
@@ -269,20 +269,16 @@ The [--ignore](https://github.com/substack/browserify-handbook/blob/master/readm
 
     }, {}],
 ```
-#### Option 3 - directly reference the global namespace and include in the bundle
-1.  The browserify-shim node causes the `require("./src/fake-lib.js")` to execute the lib code every time (thus, re-decorating the global object)
-1.  If _**required**_, the lib is included in the bundle
-1.  The included lib is wrapped so that `require("./src/fake-lib.js")` executes the lib code with the `this` context set to the global object
+#### Option 3 - create a standalone UMD module and include it in the bundle
+ * include the UMD sub-bundle in the main bundle
+ * if the lib is UMD-aware, then the exported namespace need not be exposed on the global context
 
-package.json
-```js
-"browserify-shim": {
-    "./src/fake-lib.js": {"exports": null}
-},
-"browserify": {
-    "transform": "browserify-shim"
-},
-```
+
+1.  `require("./dist/lib-bundle.js")` will initialise the lib and return the namespace
+1.  If _**required**_, the lib is included in the bundle
+1.  The included lib is wrapped so that `require("./src/fake-lib.js")` executes the lib code in a context having a module.exports object in scope.  Under these circumstances, the UMD-aware factory in the lib will return the namespace but will not attach it to the `window` object.
+
+package.json - no need for browserify-shim node
 
 ##### How to wrap a lib that adds a namespace onto the global object and include in the bundle
 
@@ -300,24 +296,44 @@ package.json
     </body>
 </html>
 ```
-This time, we want to wrap the the lib in such a way that it cannot pollute the global namespace but, can be accessed by other modules in the bundle as if it is on the global.
+This time, we want to wrap the the lib in such a way that it cannot pollute the global namespace but, can be accessed by other modules in the bundle.
 
 ##### step 1 - bundle the lib as a _standalone_ module
-To do this we need to use the -s option (--standalone) in the build
+To do this we need to use the -s option (--standalone) in the build from the src directory
 ```js
-  "browserify-shim": {
-    "./src/fake-lib.js": {"exports": "ns"}
-  },
-  "browserify": {
-    "transform": "browserify-shim"
-  },
   "scripts": {
     "build": "browserify ./fake-lib.js -s ns > ../dist/lib-bundle.js",
     "build-pretty": "browserify ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle.js"
   },
 ```
-----------
-----------
+##### step 2 - require the bundled lib in the app
+```js
+var t, _ns = require("./dist/lib-bundle.js");
+```
+##### step 3 - roll the main bundle
+package.json in the project root
+```js
+{
+  "name": "browserify-nightmare",
+  "version": "1.0.0",
+  "main": "app.js",
+  "devDependencies": {
+  },
+  "scripts": {
+    "build": "browserify ./app.js -u node-jsdom -d > ./dist/bundle.js",
+    "build-pretty": "browserify ./app.js -u node-jsdom  | js-beautify > ./dist/bundle.js"
+  },
+  "author": "cool.blue",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "node-jsdom": "^3.1.5",
+    "simple-jsdom": "^2.0.0"
+  }
+}
+```
+![image](img/opt3_log.png)
+
 
 [this answer][3] was super-helpful
 

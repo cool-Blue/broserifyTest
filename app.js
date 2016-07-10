@@ -16,7 +16,7 @@
  *  -   assume the lib module is asking for a window object to act as global
  *
  */
-var t, _ns = require("./src/fake-lib.js");
+var t, _ns = require("./dist/lib-bundle.js");
 
 if((t = typeof _ns) === 'object'){
     /**
