@@ -18,25 +18,25 @@
     }
 })(function() {
     var define, module, exports;
-    return (function e(t, n, r) {
-        function s(o, u) {
-            if (!n[o]) {
-                if (!t[o]) {
+    return (function e(moduleDefs, n, r) {
+        function s(moduleDef, u) {
+            if (!n[moduleDef]) {
+                if (!moduleDefs[moduleDef]) {
                     var a = typeof require == "function" && require;
-                    if (!u && a) return a(o, !0);
-                    if (i) return i(o, !0);
-                    var f = new Error("Cannot find module '" + o + "'");
+                    if (!u && a) return a(moduleDef, !0);
+                    if (i) return i(moduleDef, !0);
+                    var f = new Error("Cannot find module '" + moduleDef + "'");
                     throw f.code = "MODULE_NOT_FOUND", f
                 }
-                var l = n[o] = {
+                var module = n[moduleDef] = {
                     exports: {}
                 };
-                t[o][0].call(l.exports, function(e) {
-                    var n = t[o][1][e];
+                moduleDefs[moduleDef][0].call(module.exports, function(e) {
+                    var n = moduleDefs[moduleDef][1][e];
                     return s(n ? n : e)
-                }, l, l.exports, e, t, n, r)
+                }, module, module.exports, e, moduleDefs, n, r)
             }
-            return n[o].exports
+            return n[moduleDef].exports
         }
         var i = typeof require == "function" && require;
         for (var o = 0; o < r.length; o++) s(r[o]);

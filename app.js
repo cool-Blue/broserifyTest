@@ -16,7 +16,9 @@
  *  -   assume the lib module is asking for a window object to act as global
  *
  */
-var t, _ns = require("./dist/lib-bundle.js");
+// var t, _ns = require("./dist/lib-bundle.js");
+// var t, _ns = require("./dist/lib-bundle-r.js");
+var t, _ns = require("./dist/lib-bundle-thingy.js");
 
 if((t = typeof _ns) === 'object'){
     /**

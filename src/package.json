@@ -7,7 +7,9 @@
   },
   "scripts": {
     "build": "browserify ./fake-lib.js -s ns > ../dist/lib-bundle.js",
-    "build-pretty": "browserify ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle.js"
+    "build-pretty": "browserify ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle.js",
+    "build-pretty-r": "browserify -r ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle-r.js",
+    "build-pretty-thingy": "browserify ./fake-lib.js -s thingy | js-beautify > ../dist/lib-bundle-thingy.js"
   },
   "author": "cool.blue",
   "license": "MIT",

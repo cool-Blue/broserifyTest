@@ -5,8 +5,8 @@
   "devDependencies": {
   },
   "scripts": {
-    "build": "browserify ./app.js -u node-jsdom -d > ./dist/bundle.js",
-    "build-pretty": "browserify ./app.js -u node-jsdom  | js-beautify > ./dist/bundle.js"
+    "build": "browserify -x ./dist/lib-bundle ./app.js -u node-jsdom -d > ./dist/bundle.js",
+    "build-pretty": "browserify ./app.js -u node-jsdom  | js-beautify > ./dist/bundle-r.js"
   },
   "author": "cool.blue",
   "license": "MIT",
