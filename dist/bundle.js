@@ -41,8 +41,12 @@
          *  -   assume the lib module is asking for a window object to act as global
          *
          */
-        var t, _ns = require("./dist/lib-bundle.js");
+        const docPath = 'index.html';
+        var fs = require("fs"),
+            doc = fs.readFileSync(docPath, 'utf8'),
+            t, _ns = require("./dist/lib-bundle.js");
         // var t, _ns = require("./dist/lib-bundle-r.js");
+        // var t, _ns = require("./dist/lib-bundle-thingy.js");
 
         if ((t = typeof _ns) === 'object') {
             /**
@@ -66,7 +70,7 @@
             var jsdom = require('node-jsdom');
 
             jsdom.env(
-                "https://github.com/cool-Blue/broserifyTest/tree/without-global",
+                doc,
                 function(err, window) {
                     _ns = _ns(window);
                     main();
@@ -75,18 +79,15 @@
         }
 
         function main() {
-            function op(t) {
-                this.document ?
-                    document.getElementById("output").textContent += t + "\n" :
-                    console.log(t);
-            };
-
-            op(_ns.first);
-            op(_ns.second);
-
+            _ns.op(_ns.first);
+            _ns.op(_ns.second);
+            _ns.op("app.js")
         }
+        exports.ns = _ns;
+
     }, {
         "./dist/lib-bundle.js": 2,
+        "fs": 3,
         "node-jsdom": undefined
     }],
     2: [function(require, module, exports) {
@@ -111,25 +112,25 @@
                 }
             })(function() {
                 var define, module, exports;
-                return (function e(moduleDefs, n, r) {
-                    function s(moduleDef, u) {
-                        if (!n[moduleDef]) {
-                            if (!moduleDefs[moduleDef]) {
+                return (function e(t, n, r) {
+                    function s(o, u) {
+                        if (!n[o]) {
+                            if (!t[o]) {
                                 var a = typeof require == "function" && require;
-                                if (!u && a) return a(moduleDef, !0);
-                                if (i) return i(moduleDef, !0);
-                                var f = new Error("Cannot find module '" + moduleDef + "'");
+                                if (!u && a) return a(o, !0);
+                                if (i) return i(o, !0);
+                                var f = new Error("Cannot find module '" + o + "'");
                                 throw f.code = "MODULE_NOT_FOUND", f
                             }
-                            var module = n[moduleDef] = {
+                            var l = n[o] = {
                                 exports: {}
                             };
-                            moduleDefs[moduleDef][0].call(module.exports, function(e) {
-                                var n = moduleDefs[moduleDef][1][e];
+                            t[o][0].call(l.exports, function(e) {
+                                var n = t[o][1][e];
                                 return s(n ? n : e)
-                            }, module, module.exports, e, moduleDefs, n, r)
+                            }, l, l.exports, e, t, n, r)
                         }
-                        return n[moduleDef].exports
+                        return n[o].exports
                     }
                     var i = typeof require == "function" && require;
                     for (var o = 0; o < r.length; o++) s(r[o]);
@@ -174,6 +175,12 @@
                                 var _ns = {};
                                 _ns.first = "first module";
                                 _ns.second = "second module";
+                                _ns.op = function op(t) {
+                                    window.document && window.document.getElementById("output") ?
+                                        window.document.getElementById("output").textContent += t + "\n" :
+                                        console.log(t);
+                                };
+
 
                                 /**
                                  *		Register as a named AMD module, since jQuery can be concatenated with other
@@ -205,5 +212,8 @@
                 }, {}, [1])(1)
             });
         }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+    }, {}],
+    3: [function(require, module, exports) {
+
     }, {}]
 }, {}, [1]);

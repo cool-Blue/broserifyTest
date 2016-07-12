@@ -36,8 +36,14 @@
         var _ns = {};
         _ns.first = "first module";
         _ns.second = "second module";
+        _ns.op = function op(t){
+            window.document && window.document.getElementById("output")
+                ? window.document.getElementById("output").textContent += t + "\n"
+                : console.log(t);
+        };
 
-/**
+
+        /**
  *		Register as a named AMD module, since jQuery can be concatenated with other
  *		files that may use define, but not via a proper concatenation script that
  *		understands anonymous AMD modules. A named AMD is safest and most robust

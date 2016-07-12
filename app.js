@@ -16,9 +16,12 @@
  *  -   assume the lib module is asking for a window object to act as global
  *
  */
-// var t, _ns = require("./dist/lib-bundle.js");
+const docPath = 'index.html';
+var fs = require("fs"),
+    doc = fs.readFileSync(docPath, 'utf8'),
+    t, _ns = require("./dist/lib-bundle.js");
 // var t, _ns = require("./dist/lib-bundle-r.js");
-var t, _ns = require("./dist/lib-bundle-thingy.js");
+// var t, _ns = require("./dist/lib-bundle-thingy.js");
 
 if((t = typeof _ns) === 'object'){
     /**
@@ -42,22 +45,17 @@ if((t = typeof _ns) === 'object'){
     var jsdom = require('node-jsdom');
 
     jsdom.env(
-        "https://github.com/cool-Blue/broserifyTest/tree/without-global",
+        doc,
         function (err, window) {
-            _ns = _ns(window);
-            main();
+            main(_ns(window));
+            console.log(`HTML: \n ${window.document.documentElement.outerHTML}`);
+            console.log(`\noutput: \n ${window.document.getElementById("output").textContent}`);
         }
     )
 }
 
-function main(){
-    function op(t){
-        this.document
-            ? document.getElementById("output").textContent += t + "\n"
-            : console.log(t);
-    };
-
-    op(_ns.first);
-    op(_ns.second);
-
+function main(ns){
+    ns.op(ns.first);
+    ns.op(ns.second);
+    ns.op("app.js")
 }
