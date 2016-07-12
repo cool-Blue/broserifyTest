@@ -33,16 +33,24 @@
     }
 })(typeof window !== "undefined" ? window : this,
     function(window, noGlobal) {
-        var _ns = {};
-        _ns.first = "first module";
-        _ns.second = "second module";
-        _ns.op = function op(t){
-            window.document && window.document.getElementById("output")
-                ? window.document.getElementById("output").textContent += t + "\n"
-                : console.log(t);
+        var _ns = function(){
+            return new _ns.fn.init()
         };
-
-
+        _ns.fn = _ns.prototype = {
+            instance: '',
+            constructor: _ns,
+            first: "first module",
+            second: "second module",
+            op: function op(t){
+                window.document && window.document.getElementById("output")
+                    ? window.document.getElementById("output").textContent += t + "\n"
+                    : console.log(t);
+            }
+        };
+        var init = _ns.fn.init = function(){
+            this.instance = Date.now();
+        };
+        init.prototype = _ns.fn;
         /**
  *		Register as a named AMD module, since jQuery can be concatenated with other
  *		files that may use define, but not via a proper concatenation script that
