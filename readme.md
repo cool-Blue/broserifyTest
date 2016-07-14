@@ -149,9 +149,9 @@ function main(){
 
 }
 ```
-#### Option 1 - use browserify-shim to leak and import the lib namespace
- * **_include the lib in the bundle_**
- * **_export the global namespace member placed on window by the lib into the bundle_**
+#### Option 1 - expose out and shim back in 
+ * **_include the lib in the bundle but allow it to add it's namespace to `window`_**
+ * **_shim `require("libPath")` to return the lib namespace from `window`_**
 
 
 1.  If _required_, include the lib in the bundle
@@ -182,17 +182,17 @@ This is equivalent to...
     "./src/fake-lib.js": {"exports": "ns"}
 },
 ```
-
+from the console...
 ![image](img/opt1_log.png)
 
-#### Option 2 - use browserify-shim to import the namespace from an external library
- * **_exclude the lib from the bundle and serve it from a cdn via a script tag in the HTML_**
- * **_import a local copy of the global, namespace object (placed on window by the lib) into the bundle_**
+#### Option 2 - shim in from a global namespace on `window`
+ * **_exclude the lib from the bundle and serve it from a CDN via a separate script tag_**
+ * **_shim `require("libPath")` to return the lib namespace from `window`_**
 
 
 1.  The browserify-shim node causes the global `ns` to be returned by `require("./src/fake-lib.js")`
 1.  Even if _required_, the lib will not be included in the bundle
-1.  `ns` is exposed on the global object from the script tag
+1.  `ns` is exposed on the global object from a separate script tag
 
 ```html
     <body>
@@ -240,6 +240,7 @@ and in the package.json...
         "fakeLib": "global:ns"
     },
 ```
+from the console...
 ![image](img/opt1_log.png)
 
 #### Complications with including `simple-jsdom`

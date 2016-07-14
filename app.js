@@ -17,45 +17,19 @@
  *
  */
 const docPath = 'index.html';
-var fs = require("fs"),
-    doc = fs.readFileSync(docPath, 'utf8'),
-    t, _ns = require("./dist/lib-bundle.js");
-// var t, _ns = require("./dist/lib-bundle-r.js");
-// var t, _ns = require("./dist/lib-bundle-thingy.js");
+var _ns = require("./dist/lib-bundle.js");
 
-if((t = typeof _ns) === 'object'){
-    /**
-     * if the object has members then this is the namespace, otherwise fall back on
-     * window.ns
-     *
-     * run the app
-     */
-    _ns = Object.keys(_ns).length ? _ns : ns;
-    main();
-}else if(t === 'function') {
-    /**
-     * if a function is returned, assume it is asking for a window object
-     * assume that the callback returns the window object decorated with the exported
-     * namespace.
-     * This is the behaviour in node, this code is dead in the browser and simple-jsdom
-     * needs to be --ignore 'ed, --exclude 'ed
-     *
-     * run the app
-     * */
-    var jsdom = require('node-jsdom');
+require("./src/shimWindow")(_ns, function(ns){
+    _ns = ns;
+    module.exports = _ns;
+    require("./src/fake-plugin.js");
+    main(_ns)
+}, docPath);
 
-    jsdom.env(
-        doc,
-        function (err, window) {
-            main(_ns(window));
-            console.log(`HTML: \n ${window.document.documentElement.outerHTML}`);
-            console.log(`\noutput: \n ${window.document.getElementById("output").textContent}`);
-        }
-    )
-}
-
-function main(ns){
-    ns.op(ns.first);
-    ns.op(ns.second);
-    ns.op("app.js")
+function main(nS){
+    var $output = nS("#output");
+    $output.op($output.first);
+    $output.op($output.second);
+    $output.op("app.js");
+    $output.sub_op("app.js")
 }

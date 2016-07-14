@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "main": "app.js",
   "devDependencies": {
-    "browserify-shim": "^3.8.12"
+  },
+  "dependencies": {
+    "node-jsdom": "^3.1.5",
+    "simple-jsdom": "^2.0.0"
   },
   "scripts": {
     "build": "browserify ./fake-lib.js -s ns > ../dist/lib-bundle.js",
     "build-pretty": "browserify ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle.js",
     "build-pretty-r": "browserify -r ./fake-lib.js -s ns | js-beautify > ../dist/lib-bundle-r.js",
-    "build-pretty-thingy": "browserify ./fake-lib.js -s thingy | js-beautify > ../dist/lib-bundle-thingy.js"
+    "build-pretty-plug": "browserify ./fake-plugin.js -s plug | js-beautify > ../dist/lib-bundle-plugin.js"
   },
   "author": "cool.blue",
   "license": "MIT",
