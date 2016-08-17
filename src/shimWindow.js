@@ -28,7 +28,7 @@ module.exports = function(_ns, main, docPath) {
         var fs    = require("fs"),
             doc   = fs.readFileSync(docPath, 'utf8');
 
-        require('node-jsdom').env(
+        require('jsdom').env(
             doc,
             function(err, window) {
                 main(_ns(window));

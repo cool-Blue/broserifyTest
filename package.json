@@ -6,13 +6,11 @@
   },
   "scripts": {
     "build": "browserify -x ./dist/lib-bundle ./app.js -u node-jsdom -d > ./dist/bundle.js",
-    "build-pretty": "browserify ./app.js -u node-jsdom  | js-beautify > ./dist/bundle.js"
+    "build-pretty": "browserify ./app.js -u jsdom  | js-beautify > ./dist/bundle.js"
   },
   "author": "cool.blue",
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "node-jsdom": "^3.1.5",
-    "simple-jsdom": "^2.0.0"
   }
 }

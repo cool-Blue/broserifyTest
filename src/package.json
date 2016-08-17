@@ -2,11 +2,10 @@
   "name": "browserify-nightmare",
   "version": "1.0.0",
   "main": "app.js",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
-    "node-jsdom": "^3.1.5",
-    "simple-jsdom": "^2.0.0"
+    "jsdom": "^9.4.1",
+    "node-jsdom": "^3.1.5"
   },
   "scripts": {
     "build": "browserify ./fake-lib.js -s ns > ../dist/lib-bundle.js",

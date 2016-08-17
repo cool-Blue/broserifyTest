@@ -246,20 +246,17 @@ from the console...
 #### Complications with including `simple-jsdom`
 The `simple-jsdom` node package was included for idealistic reasons, to make the code isomorphic.  It satisfies fake-jQuery's need for a `window` object in node.  This module needs to be suppressed by browserify as it's not needed in the browser: that section is dead code in the browser so the lib would be pure bloat.  There are two ways to deal with this.
 
-`$ browserify ./app.js -u node-jsdom -d > ./dist/bundle.js`
+**`$ browserify ./app.js -u node-jsdom -d > ./dist/bundle.js`**  
 The [--exclude](https://github.com/substack/browserify-handbook/blob/master/readme.markdown#excluding) , or -u flag completely excludes the module from the bundle.  It is still a dependency of the consuming module and the require statement is left unchanged, but the it's value in the module map is `undefined`.  
-
 ```js
     }, {
         "./src/fake-lib.js": 2,
         "node-jsdom": undefined
     }],
 ```
-
 The `var jsdom = require('node-jsdom')` statement is still in the bundle and would in fact throw an error if executed, but this is not a problem because it's dead code in the browser.
 
-
-`$ browserify ./app.js -i node-jsdom -d > ./dist/bundle.js`
+**`$ browserify ./app.js -i node-jsdom -d > ./dist/bundle.js`**  
 The [--ignore](https://github.com/substack/browserify-handbook/blob/master/readme.markdown#ignoring) flag has a similar effect, in that the module is not loaded into the bundle, but a stub is left in it's place, which is still included in the module map although again, will never be called because the code path is dead in the browser environment but, in this case it would not throw and the require would return an empty object.
 ```js
     }, {
